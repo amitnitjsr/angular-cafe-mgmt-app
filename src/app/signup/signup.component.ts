@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-signup',
@@ -7,4 +7,12 @@ import { Component } from '@angular/core';
 })
 export class SignupComponent {
 
+  password = true;
+  confirmpassword = true;
+
+  constructor(){}
+
+  ngOnInit(): void{
+
+  }
 }
