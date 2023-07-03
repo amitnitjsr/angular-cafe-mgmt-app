@@ -42,7 +42,10 @@ export class LoginComponent implements OnInit{
       password: formData.password
     }
 
+    console.log("Login")
+
     this.userService.login(data).subscribe((response: any) => {
+      console.log("Inside Login", response)
       this.ngxService.stop();
       this.dailogRef.close();
       localStorage.setItem("token", response?.token);
