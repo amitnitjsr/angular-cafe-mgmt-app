@@ -1,12 +1,13 @@
 import { filter } from 'rxjs/operators';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { CategoryService } from './../../../services/category.service';
-import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { Component, EventEmitter, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SnackbarService } from 'src/app/services/snackbar.service';
 import { Router } from '@angular/router';
 import { MatTableDataSource } from '@angular/material/table';
 import { GlobalConstants } from 'src/app/shared/global-constants';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-category',
@@ -16,50 +17,87 @@ import { GlobalConstants } from 'src/app/shared/global-constants';
 
 export class CategoryComponent implements OnInit{
 
-  displayedColumns: string[] = ['name','edit'];
-  dataSource:any;
-  responseMessage:any;
+ onAddCategory = new EventEmitter();
+
+ onEditCategory = new EventEmitter();
+ categoryForm:any = FormGroup;
+ dialogAction:any = "Add";
+ action:any = "Add";
+ responseMessage:any;
 
   constructor(
+    @Inject(MAT_DIALOG_DATA) public dialogData:any,
+    private formBuilder:FormBuilder,
     private categoryService:CategoryService,
-    private ngsService:NgxUiLoaderService,
-    private dailog:MatDialog,
+    public dialogRef:MatDialogRef<CategoryComponent>,
     private snackbarService:SnackbarService,
-    private router:Router
   ){}
 
   ngOnInit(): void {
-    this.ngsService.start();
-    this.tableData();
+    this.categoryForm = this.formBuilder.group({
+      name:[null,[Validators.required]]
+    });
+    if(this.dialogData.action === 'Edit'){
+      this.dialogAction = 'Edit';
+      this.action = 'Update';
+      this.categoryForm.patchValue(this.dialogData.data);
+    }
   }
 
-  tableData() {
-    this.categoryService.getCategory().subscribe((response:any)=> {
-      this.ngsService.stop();
-      this.dataSource = new MatTableDataSource(response);
-    },(error:any) => {
-      this.ngsService.stop();
-      console.log(error.error?.message);
-      if(error.error?.message){
-        this.responseMessage = error.error?.message;
-      }
-      else{
-        this.responseMessage = GlobalConstants.genericError;
-      }
-      this.snackbarService.openSnackBar(this.responseMessage, GlobalConstants.error);
-    })
+ handleSubmit(){
+  if(this.dialogAction === 'Edit'){
+    this.edit();
   }
-
-  applyFilter(event:any) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+  else{
+    this.add();
   }
+ }
 
-  handleAddAction() {
-
+ add(){
+  var formData = this.categoryForm.value;
+  var data = {
+    name: formData.name
   }
+  this.categoryService.add(data).subscribe((response:any) => {
+    this.dialogRef.close();
+    this.onAddCategory.emit();
+    this.responseMessage = response.message;
+    this.snackbarService.openSnackBar(this.responseMessage, "success");
+  }, (error:any) => {
+    this.dialogRef.close();
+    console.log(error);
+    if(error.error?.message){
+      this.responseMessage = error.error?.message;
+    }
+    else{
+      this.responseMessage = GlobalConstants.genericError;
+    }
+    this.snackbarService.openSnackBar(this.responseMessage, GlobalConstants.error);
+  })
+ }
 
-  handleEditAction(data:any){
-
+ edit(){
+  var formData = this.categoryForm.value;
+  var data = {
+    id: this.dialogData.data.id,
+    name: formData.name
   }
+  this.categoryService.update(data).subscribe((response:any) => {
+    this.dialogRef.close();
+    this.onAddCategory.emit();
+    this.responseMessage = response.message;
+    this.snackbarService.openSnackBar(this.responseMessage, "success");
+  }, (error:any) => {
+    this.dialogRef.close();
+    console.log(error);
+    if(error.error?.message){
+      this.responseMessage = error.error?.message;
+    }
+    else{
+      this.responseMessage = GlobalConstants.genericError;
+    }
+    this.snackbarService.openSnackBar(this.responseMessage, GlobalConstants.error);
+  })
+ }
+
 }
