@@ -13,7 +13,7 @@
         <div fxFlex fxLayout="column">
             <div fxLayout="row wrap">
                 <mat-form-field appearence="outline" fxFlex>
-                    <mat-label>Namr</mat-label>
+                    <mat-label>Name</mat-label>
                     <input matInput formControlName="name" required>
                     <mat-error *ngIf="categoryForm.controls.name.touched && categoryForm.controls.name.invalid">
                         <span *ngIf="categoryForm.controls.name.errors.required">
@@ -26,7 +26,7 @@
     </form>
 </mat-dialog-content>
 
-<mat-dialog-actions algin="end">
+<mat-dialog-actions align="end">
     <button mat-raised-button color="primary" 
     type="submit" (click)="handleSubmit()"
     [disabled]="!(categoryForm.valid && categoryForm.dirty)">
