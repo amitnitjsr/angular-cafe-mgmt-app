@@ -5,6 +5,8 @@ import { RouteGuardService } from '../services/route-guard.service';
 import { ManageProductComponent } from './manage-product/manage-product.component';
 import { ManageOrderComponent } from './manage-order/manage-order.component';
 import { ViewBillProductsComponent } from './dialog/view-bill-products/view-bill-products.component';
+import { ViewBillComponent } from './view-bill/view-bill.component';
+import { ManageUserComponent } from './manage-user/manage-user.component';
 
 
 export const MaterialRoutes: Routes = [
@@ -34,10 +36,18 @@ export const MaterialRoutes: Routes = [
     },
     {
         path:'bill',
-        component: ViewBillProductsComponent,
+        component: ViewBillComponent,
         canActivate: [RouteGuardService],
         data:{
             expectRole: ['admin','user']
+        }
+    },
+    {
+        path:'user',
+        component: ManageUserComponent,
+        canActivate: [RouteGuardService],
+        data:{
+            expectRole: ['admin']
         }
     }
 ];

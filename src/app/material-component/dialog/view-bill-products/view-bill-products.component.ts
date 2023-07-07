@@ -1,6 +1,6 @@
 import { filter } from 'rxjs/operators';
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
@@ -15,46 +15,18 @@ import { GlobalConstants } from 'src/app/shared/global-constants';
 })
 export class ViewBillProductsComponent implements OnInit {
 
-  displayedColumns: string[] = ['name','email','contactNumber','total','view'];
+  displayedColumns: string[] = ['name','category','price','quantity','total'];
   dataSource:any;
-  responseMessage:any;
+  data:any;
 
   constructor(
-    private billService:BillService,
-    private dialog:MatDialog,
-    private snackbarService:SnackbarService,
-    private router:Router,
-    private ngxService:NgxUiLoaderService
+    @Inject(MAT_DIALOG_DATA) public dialogData:any,
+    public dialogRef: MatDialogRef<ViewBillProductsComponent>
   ) { }
 
   ngOnInit() {
-    this.ngxService.start();
-    this.tableData();
+    this.data = this.dialogData.data;
+    this.dataSource = JSON.parse(this.dialogData.data.productDetail);
   }
 
-  tableData() {
-    this.billService.getBills().subscribe((response:any) => {
-      this.ngxService.stop();
-      this.dataSource = new MatTableDataSource(response);
-    },(error:any)=>{
-      this.ngxService.stop();
-      console.log(error.error?.message);
-      if(error.error?.message){
-        this.responseMessage = error.error?.message;
-      }
-      else{
-        this.responseMessage = GlobalConstants.genericError;
-      }
-      this.snackbarService.openSnackBar(this.responseMessage, GlobalConstants.error);
-    });
-  }
-  
-  applyFilter(event:Event){
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-  }
-
-  handleViewAction(values:any){
-    
-  }
 }
