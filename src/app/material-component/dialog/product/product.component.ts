@@ -37,8 +37,7 @@ export class ProductComponent implements OnInit{
       name:[null,[Validators.required, Validators.pattern(GlobalConstants.nameRegex)]],
       categoryId:[null,[Validators.required]],
       price:[null,[Validators.required]],
-      descriptiob:[null,[Validators.required]]
-
+      description:[null,[Validators.required]]
     });
 
     if(this.dialogData.action === 'Edit'){
